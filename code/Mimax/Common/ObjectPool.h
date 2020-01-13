@@ -13,6 +13,7 @@ class CObjectPool
 public:
     void ResetPool();
     void ResetPool(size_t const poolSize);
+    bool IsEmpty() { return m_objects.size() == m_objects.capacity(); }
 
     template<typename ...TArgs>
     TObject* AllocateObject(TArgs&& ...args);
