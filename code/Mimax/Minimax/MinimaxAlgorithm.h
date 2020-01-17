@@ -38,13 +38,13 @@ private:
 
     struct STraversalResult
     {
-        int m_score = 0;
+        float m_score = 0;
         TTransition m_transition; 
     };
 private:
     STraversalResult VisitNode(SNode& node, size_t const depth);
     SNode* CreateNode(TState const& parent, TTransition const transition);
-    bool IsBetter(int const newScore, int const currentScore, size_t const depth) const;
+    bool IsBetter(float const newScore, float const currentScore, size_t const depth) const;
 private:
     CObjectPool<SNode> m_nodesPool;
     IResolver* const m_resolver;
@@ -120,7 +120,7 @@ typename CMinimaxAlgorithm<TState, TTransition>::SNode* CMinimaxAlgorithm<TState
 }
 
 template<typename TState, typename TTransition>
-bool CMinimaxAlgorithm<TState, TTransition>::IsBetter(int const newScore, int const currentScore, size_t const depth) const
+bool CMinimaxAlgorithm<TState, TTransition>::IsBetter(float const newScore, float const currentScore, size_t const depth) const
 {
     return ((depth & 1) ? newScore < currentScore : newScore > currentScore);
 }
