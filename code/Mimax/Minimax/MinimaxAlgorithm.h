@@ -133,7 +133,7 @@ typename CMinimaxAlgorithm<TState, TTransition>::STraversalResult CMinimaxAlgori
     for(auto& child: node.m_children)
     {
         auto const childResult = VisitNode(*child.m_node, nextOperation);
-        if(firstChild && IsBetter(childResult.m_score, result.m_score, operation))
+        if(firstChild || IsBetter(childResult.m_score, result.m_score, operation))
         {
             firstChild = false;
             result.m_transition = child.m_transition;
