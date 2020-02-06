@@ -5,8 +5,10 @@ namespace mimax
 
 struct SMinimaxConfig
 {
-    size_t m_maxNodesCount = 0;
-    size_t m_maxDepth = 0;
+    unsigned int m_maxNodesCount = 0;
+    unsigned int m_maxDepth = 0;
+    bool m_staticTree = true;
+
 };
 
 template<typename TState, typename TTransition>
