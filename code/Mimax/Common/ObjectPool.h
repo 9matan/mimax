@@ -21,12 +21,7 @@ public:
         m_objects.reserve(poolSize);
     }
     bool IsEmpty() { return m_objects.size() == m_objects.capacity(); }
-
-    void FreeLastObject()
-    {
-        assert(!m_objects.empty());
-        m_objects.pop_back();
-    }
+     size_t GetAllocatedSize() const { return m_objects.size(); }
 
     template<typename ...TArgs>
     TObject* AllocateObject(TArgs&& ...args)
@@ -35,7 +30,6 @@ public:
         m_objects.emplace_back(std::forward<TArgs>(args)...);
         return &m_objects.back();
     }
-
 private:
     std::vector<TObject> m_objects;
 };
