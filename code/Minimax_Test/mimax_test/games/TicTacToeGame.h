@@ -13,6 +13,9 @@ namespace tic_tac_toe {
         // '-' empty, 'X' x, 'O' o, 'D' draw
         char m_map[3][4];
         char m_player;
+
+        bool operator==(SGameState const& another) const;
+        bool operator!=(SGameState const& another) const { return !this->operator==(another); }
     };
 
     void MakeMove(SGameState& state, SMove const move);
@@ -34,7 +37,8 @@ namespace tic_tac_toe {
         }
     }
 
-    char PlayGame(SGameState state, std::function<SMove(SGameState const&)> nextMoveFunc);
+    using FindNextMoveFunc = std::function<SMove(SGameState const&)>;
+    char PlayGame(SGameState state, FindNextMoveFunc nextMoveFunc);
 }
 }
 }

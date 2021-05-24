@@ -2,6 +2,9 @@
 
 #include <limits>
 
+// Define MINIMAX_ENABLE_ALPHA_BETA_PRUNING (1) to enabled pruning
+#define MINIMAX_ENABLE_ALPHA_BETA_PRUNING (1)
+
 namespace mimax {
 namespace minimax {
 
@@ -25,7 +28,11 @@ public:
 
     inline TMove Solve(TState const& state)
     {
+#if MINIMAX_ENABLE_ALPHA_BETA_PRUNING
+        return VisitState(state, 0, -std::numeric_limits<float>::max(), std::numeric_limits<float>::max()).m_move;
+#else
         return VisitState(state, 0).m_move;
+#endif // MINIMAX_ENABLE_ALPHA_BETA_PRUNING
     }
 
 private:
@@ -36,7 +43,11 @@ private:
     };
 
 private:
+#if MINIMAX_ENABLE_ALPHA_BETA_PRUNING
+    STraversalResult VisitState(TState const& state, size_t const depth, float alpha, float beta)
+#else
     STraversalResult VisitState(TState const& state, size_t const depth)
+#endif // MINIMAX_ENABLE_ALPHA_BETA_PRUNING
     {
         STraversalResult result;
         if(depth == m_maxDepth)
@@ -61,11 +72,27 @@ private:
         {
             TState childState = state;
             m_resolver.MakeMove(childState, move);
+#if MINIMAX_ENABLE_ALPHA_BETA_PRUNING
+            auto const childResult = VisitState(childState, depth + 1, alpha, beta);
+#else
             auto const childResult = VisitState(childState, depth + 1);
+#endif // MINIMAX_ENABLE_ALPHA_BETA_PRUNING
             if(minOp && (childResult.m_score < result.m_score) || !minOp && (childResult.m_score > result.m_score))
             {
                 result.m_move = move;
                 result.m_score = childResult.m_score;
+#if MINIMAX_ENABLE_ALPHA_BETA_PRUNING
+                if (minOp)
+                {
+                    beta = (result.m_score < beta) ? result.m_score : beta;
+                }
+                else
+                {
+                    alpha = (result.m_score > alpha) ? result.m_score : alpha;
+                }
+
+                if (alpha >= beta) break;
+#endif // MINIMAX_ENABLE_ALPHA_BETA_PRUNING
             }
         }
 
