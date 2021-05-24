@@ -4,8 +4,8 @@
 #include <vector>
 #include <utility>
 
-namespace mimax
-{
+namespace mimax {
+namespace common {
 
 template<typename TObject>
 class CObjectPool
@@ -34,4 +34,5 @@ private:
     std::vector<TObject> m_objects;
 };
 
+}
 }
