@@ -24,12 +24,25 @@ public:
     CMinimaxAlgorithmBase(size_t const maxDepth, TResolver const& resolver)
         : m_maxDepth(maxDepth)
         , m_resolver(resolver)
+#if MINIMAX_ENABLE_ALPHA_BETA_PRUNING
+        , m_minValue(-std::numeric_limits<float>::max())
+        , m_maxValue(std::numeric_limits<float>::max())
+#endif // MINIMAX_ENABLE_ALPHA_BETA_PRUNING
     {}
+
+#if MINIMAX_ENABLE_ALPHA_BETA_PRUNING
+    CMinimaxAlgorithmBase(size_t const maxDepth, TResolver const& resolver, float const minValue, float const maxValue)
+        : m_maxDepth(maxDepth)
+        , m_resolver(resolver)
+        , m_minValue(minValue)
+        , m_maxValue(maxValue)
+    {}
+#endif // MINIMAX_ENABLE_ALPHA_BETA_PRUNING
 
     inline TMove Solve(TState const& state)
     {
 #if MINIMAX_ENABLE_ALPHA_BETA_PRUNING
-        return VisitState(state, 0, -std::numeric_limits<float>::max(), std::numeric_limits<float>::max()).m_move;
+        return VisitState(state, 0, m_minValue, m_maxValue).m_move;
 #else
         return VisitState(state, 0).m_move;
 #endif // MINIMAX_ENABLE_ALPHA_BETA_PRUNING
@@ -49,48 +62,36 @@ private:
     STraversalResult VisitState(TState const& state, size_t const depth)
 #endif // MINIMAX_ENABLE_ALPHA_BETA_PRUNING
     {
-        STraversalResult result;
-        if(depth == m_maxDepth)
-        {
-            result.m_score = m_resolver.EvaluateState(state);
-            return result; 
-        }
         TMovesContainer moves;
-        m_resolver.GetPossibleMoves(moves, state);
+        if(depth != m_maxDepth)
+        {
+            m_resolver.GetPossibleMoves(moves, state);
+        }
+        STraversalResult result;
         if(moves.empty())
         {
-            result.m_score = m_resolver.EvaluateState(state);
+            int const colorMultiplier = (depth & 1) == 0 ? 1 : -1;
+            result.m_score = m_resolver.EvaluateState(state) * colorMultiplier;
             return result; 
         }
 
-        bool const minOp = (depth & 1);
-        result.m_score = minOp
-            ? std::numeric_limits<float>::max()
-            : -std::numeric_limits<float>::max();
+        result.m_score = -std::numeric_limits<float>::max();
 
         for(auto const move: moves)
         {
             TState childState = state;
             m_resolver.MakeMove(childState, move);
 #if MINIMAX_ENABLE_ALPHA_BETA_PRUNING
-            auto const childResult = VisitState(childState, depth + 1, alpha, beta);
+            auto const childResult = VisitState(childState, depth + 1, -beta, -alpha);
 #else
             auto const childResult = VisitState(childState, depth + 1);
 #endif // MINIMAX_ENABLE_ALPHA_BETA_PRUNING
-            if(minOp && (childResult.m_score < result.m_score) || !minOp && (childResult.m_score > result.m_score))
+            if(-childResult.m_score > result.m_score)
             {
                 result.m_move = move;
-                result.m_score = childResult.m_score;
+                result.m_score = -childResult.m_score;
 #if MINIMAX_ENABLE_ALPHA_BETA_PRUNING
-                if (minOp)
-                {
-                    beta = (result.m_score < beta) ? result.m_score : beta;
-                }
-                else
-                {
-                    alpha = (result.m_score > alpha) ? result.m_score : alpha;
-                }
-
+                alpha = (result.m_score > alpha) ? result.m_score : alpha;
                 if (alpha >= beta) break;
 #endif // MINIMAX_ENABLE_ALPHA_BETA_PRUNING
             }
@@ -102,6 +103,10 @@ private:
 private:
     TResolver m_resolver;
     size_t m_maxDepth;
+#if MINIMAX_ENABLE_ALPHA_BETA_PRUNING
+    float m_minValue;
+    float m_maxValue;
+#endif // MINIMAX_ENABLE_ALPHA_BETA_PRUNING
 };
 
 }

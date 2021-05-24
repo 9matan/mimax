@@ -4,11 +4,16 @@
 
 #include "mimax/minimax/MinimaxAlgorithmBase.h"
 
-#include "mimax_test/minimax/Helper_Minimax_TicTacToe.h"
+#include "mimax_test/games/TicTacToeGame.h"
 
 namespace mimax_test {
 namespace minimax {
 namespace tic_tac_toe {
+
+    using STicTacToeMove = mimax_test::games::tic_tac_toe::SMove;
+    using STicTacToeState = mimax_test::games::tic_tac_toe::SGameState;
+    using CTicTacToeMovesContainer = std::vector<STicTacToeMove>;
+    using FindNextMoveFunc = mimax_test::games::tic_tac_toe::FindNextMoveFunc;
 
     class CMinimaxResolver
     {
@@ -69,6 +74,30 @@ namespace tic_tac_toe {
             CTicTacToeMinimax minimax(9, CMinimaxResolver(state.m_player, unexpectedStates));
             return minimax.Solve(state);
         };
+    }
+
+    static void PlayGame_ExpextedWinner_TestCase(FindNextMoveFunc func, STicTacToeState const& state, char const expectedWinner)
+    {
+        assert(mimax_test::games::tic_tac_toe::PlayGame(state, func) == expectedWinner);
+    }
+
+    static void FindNextMove_Expected_TestCase(FindNextMoveFunc func, STicTacToeState const& state, CTicTacToeMovesContainer const expectedMoves)
+    {
+        auto const move = func(state);
+        for (auto const expected : expectedMoves)
+        {
+            if (move == expected) return;
+        }
+        assert(false);
+    }
+
+    static void FindNextMove_Unexpected_TestCase(FindNextMoveFunc func, STicTacToeState const& state, CTicTacToeMovesContainer const unexpectedMoves)
+    {
+        auto const move = func(state);
+        for (auto const unexpected : unexpectedMoves)
+        {
+            assert(move != unexpected);
+        }
     }
 
     void RunMinimaxTests()
@@ -137,7 +166,6 @@ namespace tic_tac_toe {
         );
 
 #if MINIMAX_ENABLE_ALPHA_BETA_PRUNING
-        // alpha beta test
         PlayGame_ExpextedWinner_TestCase(
             Create_FindNextMove_UnexpectedStates(
                 {
