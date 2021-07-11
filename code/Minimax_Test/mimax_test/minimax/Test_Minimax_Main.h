@@ -2,8 +2,6 @@
 
 namespace mimax_test {
 namespace minimax {
-namespace tic_tac_toe {
     void RunTests();
-}
 }
 }

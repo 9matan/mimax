@@ -100,7 +100,7 @@ namespace tic_tac_toe {
         }
     }
 
-    void RunMinimaxTests()
+    void RunTests()
     {
         FindNextMove_Expected_TestCase(FindNextMove,
             {
