@@ -1,5 +1,7 @@
 using Sharpmake;
 
+[module: Sharpmake.Include(@"MCTS\MCTS.sharpmake.cs")]
+[module: Sharpmake.Include(@"MCTS_Test\MCTS_test.sharpmake.cs")]
 [module: Sharpmake.Include(@"Mimax_TestAll\Mimax_TestAll.sharpmake.cs")]
 [module: Sharpmake.Include(@"MimaxCommon\MimaxCommon.sharpmake.cs")]
 [module: Sharpmake.Include(@"MimaxCommon_Test\MimaxCommon_Test.sharpmake.cs")]
@@ -20,9 +22,11 @@ public class MimaxSolution : CommonSolution
 		
         conf.SolutionPath = @"[solution.SharpmakeCsPath]\Sharpmake\generated";
 		
+		conf.AddProject<MCTSProject>(target);
 		conf.AddProject<MimaxCommonProject>(target);
 		conf.AddProject<MinimaxProject>(target);
 
+		conf.AddProject<MCTSTestProject>(target);
 		conf.AddProject<MimaxCommonTestProject>(target);
 		conf.AddProject<MimaxTestAllProject>(target);
 		conf.AddProject<MinimaxTestProject>(target);

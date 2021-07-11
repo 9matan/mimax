@@ -1,11 +1,11 @@
 using Sharpmake;
 
 [Generate]
-public class MimaxTestAllProject : CommonProject
+public class MCTSTestProject : CommonProject
 {
-    public MimaxTestAllProject()
+    public MCTSTestProject()
     {
-        Name = "Mimax_TestAll";
+        Name = "MCTS_Test";
         SourceRootPath = @"[project.SharpmakeCsPath]";
     }
 
@@ -13,8 +13,11 @@ public class MimaxTestAllProject : CommonProject
     {
         base.ConfigureAll(conf, target);
 
-        conf.AddPrivateDependency<MCTSTestProject>(target);
+        conf.IncludePaths.Add(@"[project.SourceRootPath]");
+
         conf.AddPrivateDependency<MimaxCommonTestProject>(target);
-        conf.AddPrivateDependency<MinimaxTestProject>(target);
+        conf.AddPrivateDependency<MCTSProject>(target);
+		
+        conf.Output = Configuration.OutputType.Lib;
     }
 }
