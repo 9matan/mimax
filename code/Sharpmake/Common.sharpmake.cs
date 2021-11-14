@@ -11,8 +11,7 @@ public class CommonProject : Project
 	
 	[Configure]
 	public virtual void ConfigureAll(Project.Configuration conf, Target target)
-	{		
-        conf.ProjectPath = @"[project.SharpmakeCsPath]\..\Sharpmake\generated\[project.Name]";
+	{
         conf.TargetPath = @"[project.SharpmakeCsPath]\..\..\Bin\[target.Platform]_[target.Optimization]";
 
         conf.Options.Add(Options.Vc.Compiler.Exceptions.Enable);
