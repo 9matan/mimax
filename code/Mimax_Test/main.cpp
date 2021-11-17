@@ -1,10 +1,8 @@
-#include "mimax_test/common/Test_MimaxCommon.h"
-#include "mimax_test/minimax/Test_Minimax.h"
+#include "gtest/gtest.h"
 
-int main()
+int main(int argc, char** argv)
 {
-    mimax_test::common::RunTests();
-    mimax_test::minimax::RunTests();
-
-    return 0;
+    printf("Running tests from %s\n", __FILE__);
+    testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
 }

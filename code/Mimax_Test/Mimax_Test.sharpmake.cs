@@ -13,8 +13,9 @@ public class MimaxTestProject : CommonProject
     {
         base.ConfigureAll(conf, target);
 
-		conf.IncludePaths.Add(@"[project.SourceRootPath]");
+        conf.IncludePaths.Add(@"[project.SourceRootPath]");
 
         conf.AddPrivateDependency<MimaxProject>(target);
+        conf.AddPrivateDependency<GTestProject>(target);
     }
 }
