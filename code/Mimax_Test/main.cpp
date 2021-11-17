@@ -1,5 +1,5 @@
-#include "mimax_test/common/Test_MimaxCommon_Main.h"
-#include "mimax_test/minimax/Test_Minimax_Main.h"
+#include "mimax_test/common/Test_MimaxCommon.h"
+#include "mimax_test/minimax/Test_Minimax.h"
 
 int main()
 {

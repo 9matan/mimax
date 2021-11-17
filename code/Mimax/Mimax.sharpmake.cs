@@ -1,11 +1,11 @@
 using Sharpmake;
 
 [Generate]
-public class MimaxCommonTestProject : CommonProject
+public class MimaxProject : CommonProject
 {
-    public MimaxCommonTestProject()
+    public MimaxProject()
     {
-        Name = "MimaxCommon_Test";
+        Name = "Mimax";
         SourceRootPath = @"[project.SharpmakeCsPath]";
     }
 
@@ -13,10 +13,11 @@ public class MimaxCommonTestProject : CommonProject
     {
         base.ConfigureAll(conf, target);
 
+        conf.PrecompHeader = "Mimax_PCH.h";
+        conf.PrecompSource = "Mimax_PCH.cpp";
+
         conf.IncludePaths.Add(@"[project.SourceRootPath]");
 
-        conf.AddPrivateDependency<MimaxCommonProject>(target);
-		
         conf.Output = Configuration.OutputType.Lib;
     }
 }
