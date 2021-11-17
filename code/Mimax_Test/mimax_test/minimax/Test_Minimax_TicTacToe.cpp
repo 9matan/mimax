@@ -1,6 +1,8 @@
-#include <cassert>
 #include <string>
 #include <vector>
+
+#include "gtest/gtest.h"
+#include "gmock/gmock.h"
 
 #include "mimax/minimax/MinimaxAlgorithmBase.h"
 
@@ -22,9 +24,9 @@ namespace tic_tac_toe {
             : m_myPlayer(myPlayer)
         {}
 
-        CMinimaxResolver(char const myPlayer, std::vector<STicTacToeState> const& unexpectedState)
+        CMinimaxResolver(char const myPlayer, std::vector<STicTacToeState> const& unexpectedStates)
             : m_myPlayer(myPlayer)
-            , m_unexpectedStates(unexpectedState)
+            , m_unexpectedStates(unexpectedStates)
         {}
 
         float EvaluateState(STicTacToeState const& state)
@@ -54,21 +56,13 @@ namespace tic_tac_toe {
     private:
         void CheckUnexpectedStates(STicTacToeState const& state)
         {
-            for (auto const& unexpectedState : m_unexpectedStates)
-            {
-                assert(unexpectedState != state);
-            }
+            EXPECT_THAT(m_unexpectedStates, testing::Not(testing::Contains(state)));
         }
     };
 
     using CTicTacToeMinimax = mimax::minimax::CMinimaxAlgorithmBase<STicTacToeState, STicTacToeMove, CTicTacToeMovesContainer, CMinimaxResolver>;
-    static STicTacToeMove FindNextMove(STicTacToeState const& state)
-    {
-        CTicTacToeMinimax minimax(9, CMinimaxResolver(state.m_player));
-        return minimax.Solve(state);
-    }
 
-    static FindNextMoveFunc Create_FindNextMove_UnexpectedStates(std::vector<STicTacToeState> const& unexpectedStates)
+    static FindNextMoveFunc CreateFindNextMoveFunc(std::vector<STicTacToeState> const& unexpectedStates = std::vector<STicTacToeState>())
     {
         return [&unexpectedStates](STicTacToeState const& state) {
             CTicTacToeMinimax minimax(9, CMinimaxResolver(state.m_player, unexpectedStates));
@@ -76,42 +70,57 @@ namespace tic_tac_toe {
         };
     }
 
-    static void PlayGame_ExpextedWinner_TestCase(FindNextMoveFunc func, STicTacToeState const& state, char const expectedWinner)
+    static void FindNextMove_SpecifiedState_ReturnsExpectedMove(STicTacToeState const& state, CTicTacToeMovesContainer const& expectedMoves)
     {
-        assert(mimax_test::games::tic_tac_toe::PlayGame(state, func) == expectedWinner);
+        auto findNextMoveFunc = CreateFindNextMoveFunc();
+
+        auto move = findNextMoveFunc(state);
+
+        EXPECT_THAT(expectedMoves, testing::Contains(move));
     }
 
-    static void FindNextMove_Expected_TestCase(FindNextMoveFunc func, STicTacToeState const& state, CTicTacToeMovesContainer const expectedMoves)
+    static void FindNextMove_SpecifiedState_NotReturnsUnexpectedMove(STicTacToeState const& state, CTicTacToeMovesContainer const& unexpectedMoves)
     {
-        auto const move = func(state);
-        for (auto const expected : expectedMoves)
-        {
-            if (move == expected) return;
-        }
-        assert(false);
+        auto findNextMoveFunc = CreateFindNextMoveFunc();
+
+        auto move = findNextMoveFunc(state);
+
+        EXPECT_THAT(unexpectedMoves, testing::Not(testing::Contains(move)));
     }
 
-    static void FindNextMove_Unexpected_TestCase(FindNextMoveFunc func, STicTacToeState const& state, CTicTacToeMovesContainer const unexpectedMoves)
+    static void PlayGame_SpecifiedState_ReturnsExpectedWinner(STicTacToeState const& state, char const expectedWinner)
     {
-        auto const move = func(state);
-        for (auto const unexpected : unexpectedMoves)
-        {
-            assert(move != unexpected);
-        }
+        auto findNextMoveFunc = CreateFindNextMoveFunc();
+
+        auto const winner = mimax_test::games::tic_tac_toe::PlayGame(state, findNextMoveFunc);
+
+        EXPECT_EQ(winner, expectedWinner);
     }
 
-    void RunTests()
+#if MINIMAX_ENABLE_ALPHA_BETA_PRUNING
+    static void PlayGame_SpecifiedState_NotEntersUnexpectedStates(STicTacToeState const& state, std::vector<STicTacToeState> const& unexpectedStates)
     {
-        FindNextMove_Expected_TestCase(FindNextMove,
+        auto findNextMoveFunc = CreateFindNextMoveFunc(unexpectedStates);
+
+        mimax_test::games::tic_tac_toe::PlayGame(state, findNextMoveFunc);
+    }
+#endif // MINIMAX_ENABLE_ALPHA_BETA_PRUNING
+
+    GTEST_TEST(CMinimaxAlgorithmBase_TicTacToe, FindNextMove_SpecifiedState_ReturnsExpectedMove_1)
+    {
+        FindNextMove_SpecifiedState_ReturnsExpectedMove(
             {
-                {"XXO", 
-                 "OXX", 
+                {"XXO",
+                 "OXX",
                  "OO-"}, 'X'
             },
             { { 2, 2 } }
         );
-        
-        FindNextMove_Expected_TestCase(FindNextMove,
+    }
+
+    GTEST_TEST(CMinimaxAlgorithmBase_TicTacToe, FindNextMove_SpecifiedState_ReturnsExpectedMove_2)
+    {
+        FindNextMove_SpecifiedState_ReturnsExpectedMove(
             {
                 {"XXO",
                  "-X-",
@@ -119,8 +128,11 @@ namespace tic_tac_toe {
             },
             { { 2, 2 } }
         );
+    }
 
-        FindNextMove_Unexpected_TestCase(FindNextMove,
+    GTEST_TEST(CMinimaxAlgorithmBase_TicTacToe, FindNextMove_SpecifiedState_NotReturnsUnexpectedMove_1)
+    {
+        FindNextMove_SpecifiedState_NotReturnsUnexpectedMove(
             {
                 {"X--",
                  "-O-",
@@ -128,8 +140,11 @@ namespace tic_tac_toe {
             },
             { { 0, 2 }, {2, 0} }
         );
-
-        PlayGame_ExpextedWinner_TestCase(FindNextMove,
+    }
+    
+    GTEST_TEST(CMinimaxAlgorithmBase_TicTacToe, PlayGame_SpecifiedState_ReturnsExpectedWinner_1)
+    {
+        PlayGame_SpecifiedState_ReturnsExpectedWinner(
             {
                 {"X--",
                  "-O-",
@@ -137,8 +152,11 @@ namespace tic_tac_toe {
             },
             'X'
         );
+    }
 
-        PlayGame_ExpextedWinner_TestCase(FindNextMove,
+    GTEST_TEST(CMinimaxAlgorithmBase_TicTacToe, PlayGame_SpecifiedState_ReturnsExpectedWinner_2)
+    {
+        PlayGame_SpecifiedState_ReturnsExpectedWinner(
             {
                 {"---",
                  "---",
@@ -146,8 +164,11 @@ namespace tic_tac_toe {
             },
             'D'
         );
+    }
 
-        PlayGame_ExpextedWinner_TestCase(FindNextMove,
+    GTEST_TEST(CMinimaxAlgorithmBase_TicTacToe, PlayGame_SpecifiedState_ReturnsExpectedWinner_3)
+    {
+        PlayGame_SpecifiedState_ReturnsExpectedWinner(
             {
                 {"---",
                  "-X-",
@@ -155,8 +176,11 @@ namespace tic_tac_toe {
             },
             'D'
         );
+    }
 
-        PlayGame_ExpextedWinner_TestCase(FindNextMove,
+    GTEST_TEST(CMinimaxAlgorithmBase_TicTacToe, PlayGame_SpecifiedState_ReturnsExpectedWinner_4)
+    {
+        PlayGame_SpecifiedState_ReturnsExpectedWinner(
             {
                 {"O--",
                  "XOX",
@@ -164,23 +188,11 @@ namespace tic_tac_toe {
             },
             'O'
         );
+    }
 
-#if MINIMAX_ENABLE_ALPHA_BETA_PRUNING
-        PlayGame_ExpextedWinner_TestCase(
-            Create_FindNextMove_UnexpectedStates(
-                {
-                    {
-                        {"-OO",
-                         "XXO",
-                         "XOX"}, 'X'
-                    },
-                    {
-                        {"-OO",
-                         "XXO",
-                         "OXX"}, 'X'
-                    }
-                }
-            ),
+    GTEST_TEST(CMinimaxAlgorithmBase_TicTacToe, PlayGame_SpecifiedState_ReturnsExpectedWinner_5)
+    {
+        PlayGame_SpecifiedState_ReturnsExpectedWinner(
             {
                 {"-OO",
                  "XXO",
@@ -188,8 +200,33 @@ namespace tic_tac_toe {
             },
             'X'
         );
-#endif // MINIMAX_ENABLE_ALPHA_BETA_PRUNING
     }
-}
-}
-}
+
+#if MINIMAX_ENABLE_ALPHA_BETA_PRUNING
+    GTEST_TEST(CMinimaxAlgorithmBase_TicTacToe, PlayGame_SpecifiedState_NotEntersUnexpectedStates_1)
+    {
+        PlayGame_SpecifiedState_NotEntersUnexpectedStates(
+            {
+                {"-OO",
+                 "XXO",
+                 "--X"}, 'X'
+            },
+            {
+                {
+                    {"-OO",
+                     "XXO",
+                     "XOX"}, 'X'
+                },
+                {
+                    {"-OO",
+                     "XXO",
+                     "OXX"}, 'X'
+                }
+            }
+        );
+    }
+#endif // MINIMAX_ENABLE_ALPHA_BETA_PRUNING
+    
+} // tic_tac_toe
+} // minimax
+} // mimax_test
