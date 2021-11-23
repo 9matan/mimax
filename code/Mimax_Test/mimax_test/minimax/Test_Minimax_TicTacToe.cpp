@@ -106,7 +106,7 @@ namespace tic_tac_toe {
     }
 #endif // MINIMAX_ENABLE_ALPHA_BETA_PRUNING
 
-    GTEST_TEST(CMinimaxAlgorithmBase_TicTacToe, FindNextMove_SpecifiedState_ReturnsExpectedMove_1)
+    GTEST_TEST(CMinimaxAlgorithmBaseTicTacToe, FindNextMoveSpecifiedStateReturnsExpectedMove1)
     {
         FindNextMove_SpecifiedState_ReturnsExpectedMove(
             {
@@ -118,7 +118,7 @@ namespace tic_tac_toe {
         );
     }
 
-    GTEST_TEST(CMinimaxAlgorithmBase_TicTacToe, FindNextMove_SpecifiedState_ReturnsExpectedMove_2)
+    GTEST_TEST(CMinimaxAlgorithmBaseTicTacToe, FindNextMoveSpecifiedStateReturnsExpectedMove2)
     {
         FindNextMove_SpecifiedState_ReturnsExpectedMove(
             {
@@ -130,7 +130,7 @@ namespace tic_tac_toe {
         );
     }
 
-    GTEST_TEST(CMinimaxAlgorithmBase_TicTacToe, FindNextMove_SpecifiedState_NotReturnsUnexpectedMove_1)
+    GTEST_TEST(CMinimaxAlgorithmBaseTicTacToe, FindNextMoveSpecifiedStateNotReturnsUnexpectedMove)
     {
         FindNextMove_SpecifiedState_NotReturnsUnexpectedMove(
             {
@@ -142,7 +142,7 @@ namespace tic_tac_toe {
         );
     }
     
-    GTEST_TEST(CMinimaxAlgorithmBase_TicTacToe, PlayGame_SpecifiedState_ReturnsExpectedWinner_1)
+    GTEST_TEST(CMinimaxAlgorithmBaseTicTacToe, PlayGameSpecifiedStateReturnsWinnerX1)
     {
         PlayGame_SpecifiedState_ReturnsExpectedWinner(
             {
@@ -154,43 +154,7 @@ namespace tic_tac_toe {
         );
     }
 
-    GTEST_TEST(CMinimaxAlgorithmBase_TicTacToe, PlayGame_SpecifiedState_ReturnsExpectedWinner_2)
-    {
-        PlayGame_SpecifiedState_ReturnsExpectedWinner(
-            {
-                {"---",
-                 "---",
-                 "---"}, 'X'
-            },
-            'D'
-        );
-    }
-
-    GTEST_TEST(CMinimaxAlgorithmBase_TicTacToe, PlayGame_SpecifiedState_ReturnsExpectedWinner_3)
-    {
-        PlayGame_SpecifiedState_ReturnsExpectedWinner(
-            {
-                {"---",
-                 "-X-",
-                 "---"}, 'O'
-            },
-            'D'
-        );
-    }
-
-    GTEST_TEST(CMinimaxAlgorithmBase_TicTacToe, PlayGame_SpecifiedState_ReturnsExpectedWinner_4)
-    {
-        PlayGame_SpecifiedState_ReturnsExpectedWinner(
-            {
-                {"O--",
-                 "XOX",
-                 "--X"}, 'O'
-            },
-            'O'
-        );
-    }
-
-    GTEST_TEST(CMinimaxAlgorithmBase_TicTacToe, PlayGame_SpecifiedState_ReturnsExpectedWinner_5)
+    GTEST_TEST(CMinimaxAlgorithmBaseTicTacToe, PlayGameSpecifiedStateReturnsWinnerX2)
     {
         PlayGame_SpecifiedState_ReturnsExpectedWinner(
             {
@@ -202,8 +166,44 @@ namespace tic_tac_toe {
         );
     }
 
+    GTEST_TEST(CMinimaxAlgorithmBaseTicTacToe, PlayGameSpecifiedStateReturnsDraw1)
+    {
+        PlayGame_SpecifiedState_ReturnsExpectedWinner(
+            {
+                {"---",
+                 "---",
+                 "---"}, 'X'
+            },
+            'D'
+        );
+    }
+
+    GTEST_TEST(CMinimaxAlgorithmBaseTicTacToe, PlayGameSpecifiedStateReturnsDraw2)
+    {
+        PlayGame_SpecifiedState_ReturnsExpectedWinner(
+            {
+                {"---",
+                 "-X-",
+                 "---"}, 'O'
+            },
+            'D'
+        );
+    }
+
+    GTEST_TEST(CMinimaxAlgorithmBaseTicTacToe, PlayGameSpecifiedStateReturnsWinnerO)
+    {
+        PlayGame_SpecifiedState_ReturnsExpectedWinner(
+            {
+                {"O--",
+                 "XOX",
+                 "--X"}, 'O'
+            },
+            'O'
+        );
+    }
+
 #if MINIMAX_ENABLE_ALPHA_BETA_PRUNING
-    GTEST_TEST(CMinimaxAlgorithmBase_TicTacToe, PlayGame_SpecifiedState_NotEntersUnexpectedStates_1)
+    GTEST_TEST(CMinimaxAlgorithmBaseTicTacToe, PlayGameSpecifiedStateNotEntersUnexpectedStates)
     {
         PlayGame_SpecifiedState_NotEntersUnexpectedStates(
             {
