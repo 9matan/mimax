@@ -21,22 +21,22 @@ namespace matrix {
         EXPECT_EQ(isValidIndices, expectedResult);
     }
 
-    static void GetRowsCount_MatrixWithSpecifiedSize_ReturnsRowsCount(size_t const rowsCnt, size_t const colsCnt)
+    static void GetRowsCount_MatrixWithSpecifiedSize_ReturnsExpectedValue(size_t const rowsCnt, size_t const colsCnt, size_t const expectedRowsCnt)
     {
         CMatrix matrix(rowsCnt, colsCnt);
 
         size_t const returnedRowsCount = matrix.GetRowsCount();
 
-        EXPECT_EQ(returnedRowsCount, rowsCnt);
+        EXPECT_EQ(returnedRowsCount, expectedRowsCnt);
     }
 
-    static void GetColsCount_MatrixWithSpecifiedSize_ReturnsColsCount(size_t const rowsCnt, size_t const colsCnt)
+    static void GetColsCount_MatrixWithSpecifiedSize_ReturnsExpectedValue(size_t const rowsCnt, size_t const colsCnt, size_t const expetcedColsCnt)
     {
         CMatrix matrix(rowsCnt, colsCnt);
 
         size_t const returnedColsCount = matrix.GetColsCount();
 
-        EXPECT_EQ(returnedColsCount, colsCnt);
+        EXPECT_EQ(returnedColsCount, expetcedColsCnt);
     }
 
     static void Get_Maxtrix10x10Set_ReturnsSameValue(size_t const rIndex, size_t const cIndex, CMatrix::Scalar const value)
@@ -110,9 +110,10 @@ namespace matrix {
 
     GTEST_TEST(CommonCMatrix, GetRowsCountMatrixWithSpecifiedSizeReturnsRowsCount)
     {
-        GetRowsCount_MatrixWithSpecifiedSize_ReturnsRowsCount(0, 0);
-        GetRowsCount_MatrixWithSpecifiedSize_ReturnsRowsCount(0, 5);
-        GetRowsCount_MatrixWithSpecifiedSize_ReturnsRowsCount(4, 5);
+        GetRowsCount_MatrixWithSpecifiedSize_ReturnsExpectedValue(0, 0, 0);
+        GetRowsCount_MatrixWithSpecifiedSize_ReturnsExpectedValue(0, 5, 0);
+        GetRowsCount_MatrixWithSpecifiedSize_ReturnsExpectedValue(5, 0, 0);
+        GetRowsCount_MatrixWithSpecifiedSize_ReturnsExpectedValue(4, 5, 4);
     }
 #pragma endregion GetRowsCount
 
@@ -128,9 +129,10 @@ namespace matrix {
 
     GTEST_TEST(CommonCMatrix, GetColsCountMatrixWithSpecifiedSizeReturnsColsCount)
     {
-        GetColsCount_MatrixWithSpecifiedSize_ReturnsColsCount(0, 0);
-        GetColsCount_MatrixWithSpecifiedSize_ReturnsColsCount(5, 0);
-        GetColsCount_MatrixWithSpecifiedSize_ReturnsColsCount(5, 4);
+        GetColsCount_MatrixWithSpecifiedSize_ReturnsExpectedValue(0, 0, 0);
+        GetColsCount_MatrixWithSpecifiedSize_ReturnsExpectedValue(0, 5, 0);
+        GetColsCount_MatrixWithSpecifiedSize_ReturnsExpectedValue(5, 0, 0);
+        GetColsCount_MatrixWithSpecifiedSize_ReturnsExpectedValue(5, 4, 4);
     }
 #pragma endregion GetColsCount
 
@@ -481,6 +483,38 @@ namespace matrix {
         EXPECT_EQ(transposedMatrix, expectedResult);
     }
 #pragma endregion Transpose
+
+#pragma region AddToEachRowInPlace
+    GTEST_TEST(CommonCMatrix, AddToEachRowInPlaceAddEmptyVectorToEmptyMatrixReturnsEmptyMatrix)
+    {
+        CMatrix matrix;
+        CMatrix const vectorMatrix = CMatrix::CreateRowVector(0);
+        CMatrix const expectedResult;
+
+        matrix.AddToEachRowInPlace(vectorMatrix);
+
+        EXPECT_EQ(matrix, expectedResult);
+    }
+
+    GTEST_TEST(CommonCMatrix, AddToEachRowInPlaceAddNonEmptyVectorAndMatrixReturnsExpectedMatrix)
+    {
+        CMatrix matrix({
+            {1.0f, 2.0f, -1.0f},
+            {0.5f, -1.5f, -0.5f}
+            });
+        CMatrix const vectorMatrix = CMatrix::CreateRowVector(
+            {-1.0f, 0.5f, 1.0f}
+            );
+        CMatrix const expectedResult({
+            {0.0f, 2.5f, 0.0f},
+            {-0.5f, -1.0f, 0.5f}
+            });
+
+        matrix.AddToEachRowInPlace(vectorMatrix);
+
+        EXPECT_EQ(matrix, expectedResult);
+    }
+#pragma endregion AddToEachRowInPlace
 
 } // matrix
 } // common

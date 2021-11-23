@@ -18,10 +18,20 @@ CMatrix CMatrix::Identity(size_t const size)
 
     for (size_t i = 0; i < size; ++i)
     {
-        matrix(i, i) = Scalar(1);
+        matrix(i, i) = ScalarOne;
     }
 
     return matrix;
+}
+
+CMatrix CMatrix::CreateRowVector(size_t const size)
+{
+    return CMatrix(1, size);
+}
+
+CMatrix CMatrix::CreateRowVector(initializer_list<Scalar> const& initList)
+{
+    return CMatrix({ initList });
 }
 
 CMatrix::CMatrix()
@@ -108,8 +118,9 @@ void CMatrix::CreateData(size_t const rowsCnt, size_t const colsCnt)
 
 void CMatrix::SetSizes(size_t const rowsCnt, size_t const colsCnt)
 {
-    m_sizes[0] = rowsCnt;
-    m_sizes[1] = colsCnt;
+    bool const isEmpty = rowsCnt * colsCnt == 0;
+    m_sizes[0] = isEmpty ? 0 : rowsCnt;
+    m_sizes[1] = isEmpty ? 0 : colsCnt;
 }
 
 void CMatrix::ResetData()
@@ -159,7 +170,7 @@ bool CMatrix::operator==(CMatrix const& other) const
     return equal(begin(), end(), other.begin(), other.end(),
         [](Scalar const lhs, Scalar const rhs)
         {
-            auto const maxNumber = max({ Scalar(1), (Scalar)fabs(lhs) , (Scalar)fabs(rhs) });
+            auto const maxNumber = max({ ScalarOne, (Scalar)fabs(lhs) , (Scalar)fabs(rhs) });
             return fabs(lhs - rhs) <= maxNumber * numeric_limits<Scalar>::epsilon();
         });
 }
@@ -253,6 +264,31 @@ CMatrix CMatrix::operator*(Scalar const value) const
         });
 
     return result;
+}
+
+CMatrix CMatrix::AddToEachRow(CMatrix const& rowVectorMatrix) const
+{
+    auto result = *this;
+    return result.AddToEachRowInPlace(rowVectorMatrix);
+}
+
+CMatrix& CMatrix::AddToEachRowInPlace(CMatrix const& rowVectorMatrix)
+{
+    assert(IsRowVector(rowVectorMatrix));
+    assert(GetColsCount() == rowVectorMatrix.GetColsCount());
+
+    auto rowDataIter = begin();
+    while (rowDataIter != end())
+    {
+        transform(rowDataIter, rowDataIter + GetColsCount(), rowVectorMatrix.begin(), rowDataIter,
+            [](Scalar const lhs, Scalar const rhs)
+            {
+                return lhs + rhs;
+            });
+        rowDataIter += GetColsCount();
+    }
+
+    return *this;
 }
 
 CMatrix CMatrix::Transpose() const
