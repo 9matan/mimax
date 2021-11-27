@@ -27,7 +27,7 @@ CMatrix CMatrix::Identity(size_t const size)
 CMatrix CMatrix::Zeroes(size_t const rowsCnt, size_t const colsCnt)
 {
     CMatrix matrix(rowsCnt, colsCnt);
-    memset(matrix.m_data, 0, matrix.size() * sizeof(Scalar));
+    memset(matrix.m_data, 0, sizeof(Scalar) * matrix.size());
     return matrix;
 }
 
@@ -44,6 +44,7 @@ CMatrix CMatrix::CreateRowVector(initializer_list<Scalar> const& initList)
 CMatrix::CMatrix()
     : m_data(nullptr)
     , m_sizes{ 0, 0 }
+    , m_capacity(0)
 {
 }
 
@@ -62,13 +63,13 @@ CMatrix::CMatrix(CMatrix&& other)
 CMatrix::CMatrix(size_t const rowsCnt, size_t const colsCnt)
     : CMatrix()
 {
-    Resize(rowsCnt, colsCnt);
+    Resize(rowsCnt, colsCnt, false);
 }
 
 CMatrix::CMatrix(size_t const rowsCnt, size_t const colsCnt, Scalar const initValue)
     : CMatrix()
 {
-    Resize(rowsCnt, colsCnt);
+    Resize(rowsCnt, colsCnt, false);
     Fill(initValue);
 }
 
@@ -80,7 +81,7 @@ CMatrix::CMatrix(initializer_list<initializer_list<Scalar>> const& initList)
         ? initList.begin()->size()
         : 0;
 
-    Resize(rowsCnt, colsCnt);
+    Resize(rowsCnt, colsCnt, false);
     if (size() > 0)
     {
         CopyFrom(initList);
@@ -89,7 +90,7 @@ CMatrix::CMatrix(initializer_list<initializer_list<Scalar>> const& initList)
 
 CMatrix& CMatrix::operator=(CMatrix const& other)
 {
-    Resize(other.GetRowsCount(), other.GetColsCount());
+    Resize(other.GetRowsCount(), other.GetColsCount(), false);
     CopyFrom(other);
 
     return *this;
@@ -98,51 +99,21 @@ CMatrix& CMatrix::operator=(CMatrix const& other)
 CMatrix& CMatrix::operator=(CMatrix&& other)
 {
     m_data = other.m_data;
+    m_capacity = other.m_capacity;
     SetSizes(other.GetRowsCount(), other.GetColsCount());
 
     other.m_data = nullptr;
+    other.m_capacity = 0;
     other.SetSizes(0, 0);
 
     return *this;
 }
 
-void CMatrix::Resize(size_t const rowsCnt, size_t const colsCnt)
+void CMatrix::Resize(size_t const rowsCnt, size_t const colsCnt, bool const copyDataIfReallocated)
 {
-    if (size() < rowsCnt * colsCnt)
-    {
-        DeleteDataIfExists();
-        CreateData(rowsCnt, colsCnt);
-    }
-    else
-    {
-        SetSizes(rowsCnt, colsCnt);
-    }
-}
-
-void CMatrix::DeleteDataIfExists()
-{
-    if (m_data != nullptr)
-    {
-        delete m_data;
-        m_data = nullptr;
-        SetSizes(0, 0);
-    }
-}
-
-void CMatrix::CreateData(size_t const rowsCnt, size_t const colsCnt)
-{
-    if (rowsCnt * colsCnt > 0)
-    {
-        m_data = new Scalar[rowsCnt * colsCnt];
-    }
+    size_t const newSize = rowsCnt * colsCnt;
+    ReserveAtLeast(newSize, copyDataIfReallocated);
     SetSizes(rowsCnt, colsCnt);
-}
-
-void CMatrix::SetSizes(size_t const rowsCnt, size_t const colsCnt)
-{
-    bool const isEmpty = rowsCnt * colsCnt == 0;
-    m_sizes[0] = isEmpty ? 0 : rowsCnt;
-    m_sizes[1] = isEmpty ? 0 : colsCnt;
 }
 
 void CMatrix::Fill(Scalar const value)
@@ -172,9 +143,45 @@ void CMatrix::CopyFrom(CMatrix const& matrix)
     memcpy(m_data, matrix.m_data, sizeof(Scalar) * size());
 }
 
+void CMatrix::SetSizes(size_t const rowsCnt, size_t const colsCnt)
+{
+    bool const isEmpty = rowsCnt * colsCnt == 0;
+    m_sizes[0] = isEmpty ? 0 : rowsCnt;
+    m_sizes[1] = isEmpty ? 0 : colsCnt;
+}
+
+void CMatrix::ReserveAtLeast(size_t const capacity, bool const copyDataIfReallocated)
+{
+    if (m_capacity >= capacity) return;
+
+    auto newData = AllocateData(capacity);
+    if (copyDataIfReallocated && !empty())
+    {
+        memcpy(newData, m_data, sizeof(Scalar) * size());
+    }
+    FreeDataIfExists(m_data);
+    m_data = newData;
+
+    m_capacity = capacity;
+}
+
+CMatrix::Scalar* CMatrix::AllocateData(size_t const capacity)
+{
+    assert(capacity > 0);
+    return new Scalar[capacity];
+}
+
+void CMatrix::FreeDataIfExists(Scalar* data)
+{
+    if (data)
+    {
+        delete[] data;
+    }
+}
+
 CMatrix::~CMatrix()
 {
-    DeleteDataIfExists();
+    FreeDataIfExists(m_data);
 }
 
 bool CMatrix::operator==(CMatrix const& other) const
