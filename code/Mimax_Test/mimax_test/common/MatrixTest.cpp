@@ -194,6 +194,30 @@ namespace matrix {
     }
 #pragma endregion EqualityOperator
 
+#pragma region MoveSemantics
+    GTEST_TEST(CommonCMatrix, MoveConstructorMoveNonEmptyMatrixExpectNewMatrixHasTheSameData)
+    {
+        CMatrix matrixToMove(2, 3, CMatrix::ScalarOne);
+        auto const matrixData = matrixToMove.data();
+
+        CMatrix const matrix(move(matrixToMove));
+
+        EXPECT_EQ(matrix.data(), matrixData);
+        EXPECT_EQ(matrixToMove.data(), nullptr);
+    }
+
+    GTEST_TEST(CommonCMatrix, MoveConstructorMoveNonEmptyMatrixExpectNewMatrixIsEqualToMovedOne)
+    {
+        CMatrix matrixToMove(2, 3, CMatrix::ScalarOne);
+        CMatrix const expectedMatrix(2, 3, CMatrix::ScalarOne);
+
+        CMatrix const matrix(move(matrixToMove));
+
+        EXPECT_EQ(matrix, expectedMatrix);
+        EXPECT_EQ(matrixToMove, CMatrix());
+    }
+#pragma endregion MoveSemantics
+
 #pragma region GetElement
     GTEST_TEST(CommonCMatrix, GetElementFillConstructorReturnsAllSameValues)
     {
@@ -223,7 +247,7 @@ namespace matrix {
 #pragma endregion GetElement
 
 #pragma region AssignmentOperator
-    GTEST_TEST(CommonCMatrix, AssignmentOperatorAssignEmptyMatrixMatrixIsEmpty)
+    GTEST_TEST(CommonCMatrix, AssignmentOperatorAssignEmptyMatrixExpectMatrixIsEmpty)
     {
         CMatrix matrix(2, 3, 10.0f);
         CMatrix const assignmentMatrix;
@@ -234,7 +258,7 @@ namespace matrix {
         EXPECT_EQ(matrix.GetColsCount(), 0);
     }
 
-    GTEST_TEST(CommonCMatrix, AssignmentOperatorAssignNonEmptyMatrixMatrixIsSame)
+    GTEST_TEST(CommonCMatrix, AssignmentOperatorAssignNonEmptyMatrixExpectMatrixIsSame)
     {
         CMatrix matrix(2, 3, 10.0f);
         CMatrix const assignmentMatrix(5, 4, 3.0f);
@@ -245,14 +269,14 @@ namespace matrix {
         EXPECT_TRUE(isMatrixSame);
     }
 
-    GTEST_TEST(CommonCMatrix, AssignmentOperatorAssignNonEmptyMatrixMatrixHasDifferentDataPointer)
+    GTEST_TEST(CommonCMatrix, AssignmentOperatorAssignNonEmptyMatrixExpectMatrixHasDifferentDataPointer)
     {
         CMatrix matrix(2, 3, 10.0f);
         CMatrix const assignmentMatrix(5, 4, 3.0f);
 
         matrix = assignmentMatrix;
 
-        bool const isDataDifferent = matrix.begin() != assignmentMatrix.begin();
+        bool const isDataDifferent = matrix.data() != assignmentMatrix.data();
         EXPECT_TRUE(isDataDifferent);
     }
 #pragma endregion AssignmentOperator

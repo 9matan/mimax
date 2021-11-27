@@ -46,6 +46,12 @@ CMatrix::CMatrix(CMatrix const& other)
     *this = other;
 }
 
+CMatrix::CMatrix(CMatrix&& other)
+    : CMatrix()
+{
+    *this = move(other);
+}
+
 CMatrix::CMatrix(size_t const rowsCnt, size_t const colsCnt)
     : CMatrix()
 {
@@ -79,6 +85,17 @@ CMatrix& CMatrix::operator=(CMatrix const& other)
 {
     Resize(other.GetRowsCount(), other.GetColsCount());
     CopyFrom(other);
+
+    return *this;
+}
+
+CMatrix& CMatrix::operator=(CMatrix&& other)
+{
+    m_data = other.m_data;
+    SetSizes(other.GetRowsCount(), other.GetColsCount());
+
+    other.m_data = nullptr;
+    other.SetSizes(0, 0);
 
     return *this;
 }
