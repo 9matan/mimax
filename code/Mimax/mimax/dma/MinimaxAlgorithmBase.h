@@ -6,7 +6,7 @@
 #define MINIMAX_ENABLE_ALPHA_BETA_PRUNING (1)
 
 namespace mimax {
-namespace minimax {
+namespace dma {
 
 // TResolver
 // float EvaluateState(TState const&);
@@ -109,5 +109,5 @@ private:
 #endif // MINIMAX_ENABLE_ALPHA_BETA_PRUNING
 };
 
-}
-}
+} // dma
+} // mimax
