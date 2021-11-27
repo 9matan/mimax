@@ -12,13 +12,13 @@ namespace matrix {
     using namespace std;
     using namespace mimax::common;
 
-    static void IsValidIndices_MatrixWithSpecifiedSize_ReturnsExpectedValue(size_t const rowsCnt, size_t const colsCnt, size_t const rIndex, size_t const cIndex, bool const expectedResult)
+    static void AreIndicesValid_MatrixWithSpecifiedSize_ReturnsExpectedValue(size_t const rowsCnt, size_t const colsCnt, size_t const rIndex, size_t const cIndex, bool const expectedResult)
     {
         CMatrix matrix(rowsCnt, colsCnt);
 
-        bool const isValidIndices = matrix.IsValidIndices(rIndex, cIndex);
+        bool const AreIndicesValid = matrix.AreIndicesValid(rIndex, cIndex);
 
-        EXPECT_EQ(isValidIndices, expectedResult);
+        EXPECT_EQ(AreIndicesValid, expectedResult);
     }
 
     static void GetRowsCount_MatrixWithSpecifiedSize_ReturnsExpectedValue(size_t const rowsCnt, size_t const colsCnt, size_t const expectedRowsCnt)
@@ -63,40 +63,40 @@ namespace matrix {
         EXPECT_EQ(result, expectedMatrix);
     }
 
-#pragma region IsValidIndices
-    GTEST_TEST(CommonCMatrix, IsValidIndicesEmptyMatrixReturnsFalse)
+#pragma region AreIndicesValid
+    GTEST_TEST(CommonCMatrix, AreIndicesValidEmptyMatrixReturnsFalse)
     {
-        IsValidIndices_MatrixWithSpecifiedSize_ReturnsExpectedValue(0, 0, 0, 0, false);
-        IsValidIndices_MatrixWithSpecifiedSize_ReturnsExpectedValue(0, 0, 1, 2, false);
+        AreIndicesValid_MatrixWithSpecifiedSize_ReturnsExpectedValue(0, 0, 0, 0, false);
+        AreIndicesValid_MatrixWithSpecifiedSize_ReturnsExpectedValue(0, 0, 1, 2, false);
     }
 
-    GTEST_TEST(CommonCMatrix, IsValidIndicesEmptyRowsCountReturnsFalse)
+    GTEST_TEST(CommonCMatrix, AreIndicesValidEmptyRowsCountReturnsFalse)
     {
-        IsValidIndices_MatrixWithSpecifiedSize_ReturnsExpectedValue(0, 5, 0, 0, false);
-        IsValidIndices_MatrixWithSpecifiedSize_ReturnsExpectedValue(0, 5, 0, 1, false);
+        AreIndicesValid_MatrixWithSpecifiedSize_ReturnsExpectedValue(0, 5, 0, 0, false);
+        AreIndicesValid_MatrixWithSpecifiedSize_ReturnsExpectedValue(0, 5, 0, 1, false);
     }
 
-    GTEST_TEST(CommonCMatrix, IsValidIndicesEmptyColumnsCountReturnsFalse)
+    GTEST_TEST(CommonCMatrix, AreIndicesValidEmptyColumnsCountReturnsFalse)
     {
-        IsValidIndices_MatrixWithSpecifiedSize_ReturnsExpectedValue(5, 0, 0, 0, false);
-        IsValidIndices_MatrixWithSpecifiedSize_ReturnsExpectedValue(5, 0, 1, 0, false);
+        AreIndicesValid_MatrixWithSpecifiedSize_ReturnsExpectedValue(5, 0, 0, 0, false);
+        AreIndicesValid_MatrixWithSpecifiedSize_ReturnsExpectedValue(5, 0, 1, 0, false);
     }
 
-    GTEST_TEST(CommonCMatrix, IsValidIndicesNonEmptyMatrixInvalidIndicesReturnsFalse)
+    GTEST_TEST(CommonCMatrix, AreIndicesValidNonEmptyMatrixInvalidIndicesReturnsFalse)
     {
-        IsValidIndices_MatrixWithSpecifiedSize_ReturnsExpectedValue(4, 5, 0, 5, false);
-        IsValidIndices_MatrixWithSpecifiedSize_ReturnsExpectedValue(4, 5, 4, 0, false);
-        IsValidIndices_MatrixWithSpecifiedSize_ReturnsExpectedValue(4, 5, 4, 5, false);
+        AreIndicesValid_MatrixWithSpecifiedSize_ReturnsExpectedValue(4, 5, 0, 5, false);
+        AreIndicesValid_MatrixWithSpecifiedSize_ReturnsExpectedValue(4, 5, 4, 0, false);
+        AreIndicesValid_MatrixWithSpecifiedSize_ReturnsExpectedValue(4, 5, 4, 5, false);
     }
 
-    GTEST_TEST(CommonCMatrix, IsValidIndicesNonEmptyMatrixIndicesOnEdgeReturnsTrue)
+    GTEST_TEST(CommonCMatrix, AreIndicesValidNonEmptyMatrixIndicesOnEdgeReturnsTrue)
     {
-        IsValidIndices_MatrixWithSpecifiedSize_ReturnsExpectedValue(4, 5, 0, 0, true);
-        IsValidIndices_MatrixWithSpecifiedSize_ReturnsExpectedValue(4, 5, 0, 4, true);
-        IsValidIndices_MatrixWithSpecifiedSize_ReturnsExpectedValue(4, 5, 3, 0, true);
-        IsValidIndices_MatrixWithSpecifiedSize_ReturnsExpectedValue(4, 5, 3, 4, true);
+        AreIndicesValid_MatrixWithSpecifiedSize_ReturnsExpectedValue(4, 5, 0, 0, true);
+        AreIndicesValid_MatrixWithSpecifiedSize_ReturnsExpectedValue(4, 5, 0, 4, true);
+        AreIndicesValid_MatrixWithSpecifiedSize_ReturnsExpectedValue(4, 5, 3, 0, true);
+        AreIndicesValid_MatrixWithSpecifiedSize_ReturnsExpectedValue(4, 5, 3, 4, true);
     }
-#pragma endregion IsValidIndices
+#pragma endregion AreIndicesValid
 
 #pragma region GetRowsCount
     GTEST_TEST(CommonCMatrix, GetRowsCountDefaultConstructorReturnsZero)
@@ -195,7 +195,7 @@ namespace matrix {
 #pragma endregion EqualityOperator
 
 #pragma region MoveSemantics
-    GTEST_TEST(CommonCMatrix, MoveConstructorMoveNonEmptyMatrixExpectNewMatrixHasTheSameData)
+    GTEST_TEST(CommonCMatrix, MoveConstructorMoveNonEmptyMatrixExpectNewMatrixHasSameDataPointer)
     {
         CMatrix matrixToMove(2, 3, CMatrix::ScalarOne);
         auto const matrixData = matrixToMove.data();
@@ -246,6 +246,53 @@ namespace matrix {
     }
 #pragma endregion GetElement
 
+#pragma region Reserve
+    GTEST_TEST(CommonCMatrix, ReserveRequestMoreCapacityExpectMatrixIsSame)
+    {
+        CMatrix matrix({
+            {1.0f, 1.5f, -0.5f},
+            {0.25f, -0.75f, 0.0f}
+            });
+        CMatrix const expectedMatrix({
+            {1.0f, 1.5f, -0.5f},
+            {0.25f, -0.75f, 0.0f}
+            });
+
+        matrix.reserve(matrix.capacity() + 1);
+
+        EXPECT_EQ(matrix, expectedMatrix);
+    }
+
+    GTEST_TEST(CommonCMatrix, ReserveRequestLessCapacityExpectMatrixIsSame)
+    {
+        CMatrix matrix({
+            {1.0f, 1.5f, -0.5f},
+            {0.25f, -0.75f, 0.0f}
+            });
+        CMatrix const expectedMatrix({
+            {1.0f, 1.5f, -0.5f},
+            {0.25f, -0.75f, 0.0f}
+            });
+
+        matrix.reserve(matrix.capacity() - 1);
+
+        EXPECT_EQ(matrix, expectedMatrix);
+    }
+
+    GTEST_TEST(CommonCMatrix, ReserveRequestLessCapacityExpectMatrixHasSameDataPointer)
+    {
+        CMatrix matrix({
+            {1.0f, 1.5f, -0.5f},
+            {0.25f, -0.75f, 0.0f}
+            });
+        auto const dataBeforeReservation = matrix.data();
+
+        matrix.reserve(matrix.capacity() - 1);
+
+        EXPECT_EQ(matrix.data(), dataBeforeReservation);
+    }
+#pragma endregion Reserve
+
 #pragma region AssignmentOperator
     GTEST_TEST(CommonCMatrix, AssignmentOperatorAssignEmptyMatrixExpectMatrixIsEmpty)
     {
@@ -258,7 +305,7 @@ namespace matrix {
         EXPECT_EQ(matrix.GetColsCount(), 0);
     }
 
-    GTEST_TEST(CommonCMatrix, AssignmentOperatorAssignNonEmptyMatrixExpectMatrixIsSame)
+    GTEST_TEST(CommonCMatrix, AssignmentOperatorAssignNonEmptyMatrixExpectMatrixIsEqualToAssignedOne)
     {
         CMatrix matrix(2, 3, 10.0f);
         CMatrix const assignmentMatrix(5, 4, 3.0f);
@@ -269,7 +316,7 @@ namespace matrix {
         EXPECT_TRUE(isMatrixSame);
     }
 
-    GTEST_TEST(CommonCMatrix, AssignmentOperatorAssignNonEmptyMatrixExpectMatrixHasDifferentDataPointer)
+    GTEST_TEST(CommonCMatrix, AssignmentOperatorAssignNonEmptyMatrixExpectMaxtrixHasDifferentDataPointer)
     {
         CMatrix matrix(2, 3, 10.0f);
         CMatrix const assignmentMatrix(5, 4, 3.0f);

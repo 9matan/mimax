@@ -53,15 +53,18 @@ public:
     inline size_t GetRowsCount() const { return m_sizes[0]; }
     inline size_t GetColsCount() const { return m_sizes[1]; }
 
+    inline void resize(size_t const rowsCnt, size_t const colsCnt) { Resize(rowsCnt, colsCnt, true); }
+    inline void reserve(size_t const capacity) { ReserveAtLeast(capacity, true); }
     inline bool empty() const { return size() == 0; }
     inline size_t size() const { return GetRowsCount() * GetColsCount(); }
+    inline size_t capacity() const { return m_capacity; }
     inline Scalar* begin() { return m_data; }
     inline Scalar* end() { return m_data + size(); }
     inline Scalar const* begin() const { return m_data; }
     inline Scalar const* end() const { return m_data + size(); }
     inline Scalar const* data() const { return m_data; }
 
-    inline bool IsValidIndices(size_t const rowIndex, size_t const colIndex) const
+    inline bool AreIndicesValid(size_t const rowIndex, size_t const colIndex) const
     {
         return rowIndex < GetRowsCount() && colIndex < GetColsCount();
     }
@@ -69,19 +72,22 @@ public:
 private:
     Scalar* m_data;
     size_t m_sizes[2];
+    size_t m_capacity;
 
 private:
-    void Resize(size_t const rowsCnt, size_t const colsCnt);
-    void DeleteDataIfExists();
-    void CreateData(size_t const rowsCnt, size_t const colsCnt);
+    void Resize(size_t const rowsCnt, size_t const colsCnt, bool const copyDataIfReallocated);
     void CopyFrom(std::initializer_list<std::initializer_list<Scalar>> const& initList);
     void CopyFrom(CMatrix const& matrix);
     void Fill(Scalar const value);
     void SetSizes(size_t const rowsCnt, size_t const colsCnt);
 
+    void ReserveAtLeast(size_t const capacity, bool const copyDataIfReallocated);
+    Scalar* AllocateData(size_t const capacity);
+    void FreeDataIfExists(Scalar* data);
+
     inline size_t GetDataIndex(size_t const rowIndex, size_t const colIndex) const
     {
-        assert(IsValidIndices(rowIndex, colIndex));
+        assert(AreIndicesValid(rowIndex, colIndex));
         return rowIndex * GetColsCount() + colIndex;
     }
 };
