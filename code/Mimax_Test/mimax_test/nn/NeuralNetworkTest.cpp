@@ -66,7 +66,7 @@ GTEST_TEST(NnCNeuralNetwork, PredictZeroesTransformLayersReturnsMatrixWithExpect
     layers.emplace_back(CreateZeroesTransformationLayer(4, 5));
     layers.emplace_back(CreateZeroesTransformationLayer(5, 2));
     CNeuralNetwork network(move(layers));
-    CMatrix const input(5, 3, CMatrix::ScalarZero);
+    CMatrix const input = CMatrix::Zeroes(5, 3);
 
     CMatrix const output = network.Predict(input);
 

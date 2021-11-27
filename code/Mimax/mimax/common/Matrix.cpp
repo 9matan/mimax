@@ -24,6 +24,13 @@ CMatrix CMatrix::Identity(size_t const size)
     return matrix;
 }
 
+CMatrix CMatrix::Zeroes(size_t const rowsCnt, size_t const colsCnt)
+{
+    CMatrix matrix(rowsCnt, colsCnt);
+    memset(matrix.m_data, 0, matrix.size() * sizeof(Scalar));
+    return matrix;
+}
+
 CMatrix CMatrix::CreateRowVector(size_t const size)
 {
     return CMatrix(1, size);
@@ -56,7 +63,6 @@ CMatrix::CMatrix(size_t const rowsCnt, size_t const colsCnt)
     : CMatrix()
 {
     Resize(rowsCnt, colsCnt);
-    ResetData();
 }
 
 CMatrix::CMatrix(size_t const rowsCnt, size_t const colsCnt, Scalar const initValue)
@@ -110,7 +116,6 @@ void CMatrix::Resize(size_t const rowsCnt, size_t const colsCnt)
     else
     {
         SetSizes(rowsCnt, colsCnt);
-        ResetData();
     }
 }
 
@@ -138,11 +143,6 @@ void CMatrix::SetSizes(size_t const rowsCnt, size_t const colsCnt)
     bool const isEmpty = rowsCnt * colsCnt == 0;
     m_sizes[0] = isEmpty ? 0 : rowsCnt;
     m_sizes[1] = isEmpty ? 0 : colsCnt;
-}
-
-void CMatrix::ResetData()
-{
-    memset(m_data, 0, sizeof(Scalar) * size());
 }
 
 void CMatrix::Fill(Scalar const value)
@@ -250,7 +250,7 @@ CMatrix CMatrix::operator*(CMatrix const& other) const
 {
     assert(GetColsCount() == other.GetRowsCount());
 
-    CMatrix result(GetRowsCount(), other.GetColsCount());
+    CMatrix result = Zeroes(GetRowsCount(), other.GetColsCount());
     auto resultRowData = result.begin();
     for (int lshRowIndex = 0; lshRowIndex < GetRowsCount(); ++lshRowIndex)
     {

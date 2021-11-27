@@ -13,8 +13,8 @@ using CMatrix = mimax::common::CMatrix;
 #pragma region CActivationReLU
 GTEST_TEST(NnCActivationReLU, ActivateZoreMatrixReturnsZeroMatrix)
 {
-    CMatrix matrix(4, 4, CMatrix::ScalarZero);
-    CMatrix const expectedResult(4, 4, CMatrix::ScalarZero);
+    CMatrix matrix = CMatrix::Zeroes(4, 4);
+    CMatrix const expectedResult = CMatrix::Zeroes(4, 4);
     CActivationReLU activation;
 
     activation.Activate(matrix);
@@ -29,7 +29,7 @@ GTEST_TEST(NnCActivationReLU, ActivateNonPositiveMatrixReturnsZeroMatrix)
         {0.0f, -0.5f, 0.0f, -0.25f},
         {0.0f, -0.57f, -1.0f, -0.45f}
         });
-    CMatrix const expectedResult(3, 4, CMatrix::ScalarZero);
+    CMatrix const expectedResult = CMatrix::Zeroes(3, 4);
     CActivationReLU activation;
 
     activation.Activate(matrix);
