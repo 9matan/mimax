@@ -16,6 +16,7 @@ public:
 
 public:
     static CMatrix Identity(size_t const size);
+    static CMatrix Zeroes(size_t const rowsCnt, size_t const colsCnt);
 
     static CMatrix CreateRowVector(size_t const size);
     static CMatrix CreateRowVector(std::initializer_list<Scalar> const& initList);
@@ -73,7 +74,6 @@ private:
     void Resize(size_t const rowsCnt, size_t const colsCnt);
     void DeleteDataIfExists();
     void CreateData(size_t const rowsCnt, size_t const colsCnt);
-    void ResetData();
     void CopyFrom(std::initializer_list<std::initializer_list<Scalar>> const& initList);
     void CopyFrom(CMatrix const& matrix);
     void Fill(Scalar const value);
