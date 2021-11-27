@@ -24,12 +24,14 @@ public:
 public:
     CMatrix();
     CMatrix(CMatrix const& other);
+    CMatrix(CMatrix&& other);
     CMatrix(size_t const rowsCnt, size_t const colsCnt);
     CMatrix(size_t const rowsCnt, size_t const colsCnt, Scalar const initValue);
     CMatrix(std::initializer_list<std::initializer_list<Scalar>> const& initList);
     ~CMatrix();
 
     CMatrix& operator=(CMatrix const& other);
+    CMatrix& operator=(CMatrix&& other);
     CMatrix operator+(CMatrix const& other) const;
     CMatrix operator+(Scalar const value) const;
     CMatrix operator-(CMatrix const& other) const;
@@ -53,9 +55,10 @@ public:
     inline bool empty() const { return size() == 0; }
     inline size_t size() const { return GetRowsCount() * GetColsCount(); }
     inline Scalar* begin() { return m_data; }
-    inline Scalar* begin() const { return m_data; }
     inline Scalar* end() { return m_data + size(); }
-    inline Scalar* end() const { return m_data + size(); }
+    inline Scalar const* begin() const { return m_data; }
+    inline Scalar const* end() const { return m_data + size(); }
+    inline Scalar const* data() const { return m_data; }
 
     inline bool IsValidIndices(size_t const rowIndex, size_t const colIndex) const
     {
