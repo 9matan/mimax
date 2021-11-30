@@ -4,7 +4,7 @@
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
 
-#include "mimax/dma/MinimaxAlgorithmBase.h"
+#include "mimax/dma/MinimaxBase.h"
 
 #include "mimax_test/games/TicTacToeGame.h"
 
@@ -60,7 +60,7 @@ namespace minimax {
         }
     };
 
-    using CTicTacToeMinimax = mimax::dma::CMinimaxAlgorithmBase<STicTacToeState, STicTacToeMove, CTicTacToeMovesContainer, CMinimaxResolver>;
+    using CTicTacToeMinimax = mimax::dma::CMinimaxBase<STicTacToeState, STicTacToeMove, CTicTacToeMovesContainer, CMinimaxResolver>;
 
     static FindNextMoveFunc CreateFindNextMoveFunc(std::vector<STicTacToeState> const& unexpectedStates = std::vector<STicTacToeState>())
     {
@@ -106,7 +106,7 @@ namespace minimax {
     }
 #endif // MINIMAX_ENABLE_ALPHA_BETA_PRUNING
 
-    GTEST_TEST(DmaCMinimaxAlgorithmBaseTicTacToe, FindNextMoveSpecifiedStateReturnsExpectedMove1)
+    GTEST_TEST(DmaCMinimaxBaseTicTacToe, FindNextMoveSpecifiedStateReturnsExpectedMove1)
     {
         FindNextMove_SpecifiedState_ReturnsExpectedMove(
             {
@@ -118,7 +118,7 @@ namespace minimax {
         );
     }
 
-    GTEST_TEST(DmaCMinimaxAlgorithmBaseTicTacToe, FindNextMoveSpecifiedStateReturnsExpectedMove2)
+    GTEST_TEST(DmaCMinimaxBaseTicTacToe, FindNextMoveSpecifiedStateReturnsExpectedMove2)
     {
         FindNextMove_SpecifiedState_ReturnsExpectedMove(
             {
@@ -130,7 +130,7 @@ namespace minimax {
         );
     }
 
-    GTEST_TEST(DmaCMinimaxAlgorithmBaseTicTacToe, FindNextMoveSpecifiedStateNotReturnsUnexpectedMove)
+    GTEST_TEST(DmaCMinimaxBaseTicTacToe, FindNextMoveSpecifiedStateNotReturnsUnexpectedMove)
     {
         FindNextMove_SpecifiedState_NotReturnsUnexpectedMove(
             {
@@ -142,7 +142,7 @@ namespace minimax {
         );
     }
     
-    GTEST_TEST(DmaCMinimaxAlgorithmBaseTicTacToe, PlayGameSpecifiedStateReturnsWinnerX1)
+    GTEST_TEST(DmaCMinimaxBaseTicTacToe, PlayGameSpecifiedStateReturnsWinnerX1)
     {
         PlayGame_SpecifiedState_ReturnsExpectedWinner(
             {
@@ -154,7 +154,7 @@ namespace minimax {
         );
     }
 
-    GTEST_TEST(DmaCMinimaxAlgorithmBaseTicTacToe, PlayGameSpecifiedStateReturnsWinnerX2)
+    GTEST_TEST(DmaCMinimaxBaseTicTacToe, PlayGameSpecifiedStateReturnsWinnerX2)
     {
         PlayGame_SpecifiedState_ReturnsExpectedWinner(
             {
@@ -166,7 +166,7 @@ namespace minimax {
         );
     }
 
-    GTEST_TEST(DmaCMinimaxAlgorithmBaseTicTacToe, PlayGameSpecifiedStateReturnsDraw1)
+    GTEST_TEST(DmaCMinimaxBaseTicTacToe, PlayGameSpecifiedStateReturnsDraw1)
     {
         PlayGame_SpecifiedState_ReturnsExpectedWinner(
             {
@@ -178,7 +178,7 @@ namespace minimax {
         );
     }
 
-    GTEST_TEST(DmaCMinimaxAlgorithmBaseTicTacToe, PlayGameSpecifiedStateReturnsDraw2)
+    GTEST_TEST(DmaCMinimaxBaseTicTacToe, PlayGameSpecifiedStateReturnsDraw2)
     {
         PlayGame_SpecifiedState_ReturnsExpectedWinner(
             {
@@ -190,7 +190,7 @@ namespace minimax {
         );
     }
 
-    GTEST_TEST(DmaCMinimaxAlgorithmBaseTicTacToe, PlayGameSpecifiedStateReturnsWinnerO)
+    GTEST_TEST(DmaCMinimaxBaseTicTacToe, PlayGameSpecifiedStateReturnsWinnerO)
     {
         PlayGame_SpecifiedState_ReturnsExpectedWinner(
             {
@@ -203,7 +203,7 @@ namespace minimax {
     }
 
 #if MINIMAX_ENABLE_ALPHA_BETA_PRUNING
-    GTEST_TEST(DmaCMinimaxAlgorithmBaseTicTacToe, PlayGameSpecifiedStateNotEntersUnexpectedStates)
+    GTEST_TEST(DmaCMinimaxBaseTicTacToe, PlayGameSpecifiedStateNotEntersUnexpectedStates)
     {
         PlayGame_SpecifiedState_NotEntersUnexpectedStates(
             {

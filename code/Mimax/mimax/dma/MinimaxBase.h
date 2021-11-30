@@ -18,10 +18,10 @@ namespace dma {
 // begin(), end()
 
 template<typename TState, typename TMove, typename TMovesContainer, typename TResolver>
-class CMinimaxAlgorithmBase
+class CMinimaxBase
 {
 public:
-    CMinimaxAlgorithmBase(size_t const maxDepth, TResolver const& resolver)
+    CMinimaxBase(size_t const maxDepth, TResolver const& resolver)
         : m_maxDepth(maxDepth)
         , m_resolver(resolver)
 #if MINIMAX_ENABLE_ALPHA_BETA_PRUNING
@@ -31,7 +31,7 @@ public:
     {}
 
 #if MINIMAX_ENABLE_ALPHA_BETA_PRUNING
-    CMinimaxAlgorithmBase(size_t const maxDepth, TResolver const& resolver, float const minValue, float const maxValue)
+    CMinimaxBase(size_t const maxDepth, TResolver const& resolver, float const minValue, float const maxValue)
         : m_maxDepth(maxDepth)
         , m_resolver(resolver)
         , m_minValue(minValue)
