@@ -97,14 +97,12 @@ namespace minimax {
         EXPECT_EQ(winner, expectedWinner);
     }
 
-#if MINIMAX_ENABLE_ALPHA_BETA_PRUNING
     static void PlayGame_SpecifiedState_NotEntersUnexpectedStates(STicTacToeState const& state, std::vector<STicTacToeState> const& unexpectedStates)
     {
         auto findNextMoveFunc = CreateFindNextMoveFunc(unexpectedStates);
 
         mimax_test::games::tic_tac_toe::PlayGame(state, findNextMoveFunc);
     }
-#endif // MINIMAX_ENABLE_ALPHA_BETA_PRUNING
 
     GTEST_TEST(DmaCMinimaxBaseTicTacToe, FindNextMoveSpecifiedStateReturnsExpectedMove1)
     {
@@ -202,7 +200,6 @@ namespace minimax {
         );
     }
 
-#if MINIMAX_ENABLE_ALPHA_BETA_PRUNING
     GTEST_TEST(DmaCMinimaxBaseTicTacToe, PlayGameSpecifiedStateNotEntersUnexpectedStates)
     {
         PlayGame_SpecifiedState_NotEntersUnexpectedStates(
@@ -225,7 +222,6 @@ namespace minimax {
             }
         );
     }
-#endif // MINIMAX_ENABLE_ALPHA_BETA_PRUNING
     
 } // minimax
 } // dma
