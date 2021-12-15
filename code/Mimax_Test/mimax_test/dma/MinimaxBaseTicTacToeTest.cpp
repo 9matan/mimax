@@ -65,7 +65,14 @@ namespace minimax {
     static FindNextMoveFunc CreateFindNextMoveFunc(std::vector<STicTacToeState> const& unexpectedStates = std::vector<STicTacToeState>())
     {
         return [&unexpectedStates](STicTacToeState const& state) {
-            CTicTacToeMinimax minimax(9, CMinimaxResolver(state.m_player, unexpectedStates));
+            CTicTacToeMinimax::SConfig config;
+            config.m_maxValue = 1.0f;
+            config.m_minValue = -1.0f;
+            config.m_maxDepth = 9;
+            config.m_epsilon = 0.1f;
+            CMinimaxResolver const resolver(state.m_player, unexpectedStates);
+
+            CTicTacToeMinimax minimax(resolver, config);
             return minimax.Solve(state);
         };
     }
