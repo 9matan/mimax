@@ -73,7 +73,7 @@ namespace minimax {
             CMinimaxResolver const resolver(state.m_player, unexpectedStates);
 
             CTicTacToeMinimax minimax(resolver, config);
-            return minimax.Solve(state);
+            return minimax.FindSolution(state).value();
         };
     }
 

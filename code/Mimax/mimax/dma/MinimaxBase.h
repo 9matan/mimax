@@ -1,6 +1,7 @@
 #pragma once
 
 #include <limits>
+#include <optional>
 
 #include "mimax/dma/MinimaxDebugInfo.h"
 
@@ -25,6 +26,10 @@ template<typename TState, typename TMove, typename TMovesContainer, typename TRe
 class CMinimaxBase
 {
 public:
+    using State = TState;
+    using Move = TMove;
+
+public:
     struct SConfig
     {
         float m_minValue = -1.0f;
@@ -37,15 +42,23 @@ public:
     CMinimaxBase(TResolver const& resolver, SConfig const& config)
         : m_resolver(resolver)
         , m_config(config)
+        , m_isStopRequested(false)
     {}
 
-    inline TMove Solve(TState const& state)
+    inline std::optional<TMove> FindSolution(TState const& state)
     {
 #if MIMAX_MINIMAX_DEBUG
         m_debugInfo.Reset();
 #endif // MIMAX_MINIMAX_DEBUG
-        return VisitState(state, 0, m_config.m_minValue, m_config.m_maxValue).m_move;
+        auto const visitingResult = VisitState(state, 0, m_config.m_minValue, m_config.m_maxValue);
+        auto const move = m_isStopRequested
+            ? std::optional<TMove>()
+            : visitingResult.m_move;
+        m_isStopRequested = false;
+        return move;
     }
+
+    inline void StopAlgorithm() { m_isStopRequested = true; }
 
 #if MIMAX_MINIMAX_DEBUG
     inline SMinimaxDebugInfo const& GetDebugInfo() const { return m_debugInfo; }
@@ -84,6 +97,8 @@ private:
 
         for (size_t i = 0; i < moves.size(); ++i)
         {
+            if (m_isStopRequested) return result;
+
             auto const move = moves[i];
             TState childState = state;
             m_resolver.MakeMove(childState, move);
@@ -112,6 +127,7 @@ private:
 #if MIMAX_MINIMAX_DEBUG
     SMinimaxDebugInfo m_debugInfo;
 #endif // MIMAX_MINIMAX_DEBUG
+    bool m_isStopRequested;
 };
 
 } // dma
