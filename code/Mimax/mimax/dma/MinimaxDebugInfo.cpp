@@ -7,12 +7,19 @@ namespace dma {
 
 std::ostream& operator<<(std::ostream& o, SMinimaxDebugInfo const& debugInfo)
 {
-    o << "Visited nodes count: " << debugInfo.m_visitedNodesCnt << "\n";
-    o << "Evaluated nodes count: " << debugInfo.m_evaluatedNodesCnt << "\n";
-    o << "Pruned nodes count:\n";
     size_t const mxDepth = debugInfo.m_maxDepth > SMinimaxDebugInfo::MAX_DEPTH
         ? SMinimaxDebugInfo::MAX_DEPTH
-        : debugInfo.m_maxDepth;
+        : debugInfo.m_maxDepth + 1;
+
+    o << "Evaluated nodes count: " << debugInfo.m_evaluatedNodesCnt << "\n";
+
+    o << "Visited nodes count " << debugInfo.m_totalVisitedNodesCnt << ": \n";
+    for (size_t depth = 1; depth <= mxDepth; ++depth)
+    {
+        o << depth << ": " << debugInfo.m_visitedNodesCnt[depth] << "\n";
+    }
+
+    o << "Pruned nodes count " << debugInfo.m_totalPrunedNodesCnt << ": \n";
     for (size_t depth = 1; depth <= mxDepth; ++depth)
     {
         o << depth << ": " << debugInfo.m_prunedNodesCnt[depth] << "\n";
