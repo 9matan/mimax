@@ -21,10 +21,10 @@ TResolver
 */
 
 template<typename TState, typename TMove, typename TMovesContainer, typename TResolver>
-class CMCTSBase
+class CMctsBase
 {
 public:
-    CMCTSBase(TState const& rootSate, TResolver const& resolver, unsigned long long const randomSeed, float const explorationParam = 1.4142f)
+    CMctsBase(TState const& rootSate, TResolver const& resolver, unsigned long long const randomSeed, float const explorationParam = 1.4142f)
         : m_resolver(resolver)
         , m_randomEngine(randomSeed)
         , m_explorationParam(explorationParam)

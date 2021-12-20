@@ -11,7 +11,7 @@ namespace dma {
 namespace mcts {
 
 using namespace std;
-using mimax::dma::CMCTSBase;
+using mimax::dma::CMctsBase;
 
 using STestMove = int;
 using CTestMovesContainer = vector<STestMove>;
@@ -70,16 +70,16 @@ public:
     }
 };
 
-using CTestMCTS = CMCTSBase<STestState*, STestMove, CTestMovesContainer, CTestResolver>;
+using CTestMcts = CMctsBase<STestState*, STestMove, CTestMovesContainer, CTestResolver>;
 
-static CTestMCTS CreateTestMCTS(STestState* state)
+static CTestMcts CreateTestMCTS(STestState* state)
 {
     unsigned long long const randomSeed = 1234567890ULL;
     float const explorationParam = 1.4142f;
-    return CTestMCTS(state, CTestResolver(), randomSeed, explorationParam);
+    return CTestMcts(state, CTestResolver(), randomSeed, explorationParam);
 }
 
-static void EvaluateNTimes(CTestMCTS& mcts, size_t const iterationsCnt)
+static void EvaluateNTimes(CTestMcts& mcts, size_t const iterationsCnt)
 {
     for (size_t i = 0; i < iterationsCnt; ++i)
     {
@@ -110,7 +110,7 @@ GTEST_TEST(DmaCMCTSBase, EvaluateTwoLevelsTreeExpectOnlyRootChildrenAreVisited)
     leafs.push_back(&rootState.AddWonState().AddWonState());
     leafs.push_back(&rootState.AddWonState().AddLostState());
     leafs.push_back(&rootState.AddLostState().AddLostState());
-    CTestMCTS mcts = CreateTestMCTS(&rootState);
+    CTestMcts mcts = CreateTestMCTS(&rootState);
 
     EvaluateNTimes(mcts, 3);
 
@@ -129,7 +129,7 @@ GTEST_TEST(DmaCMCTSBase, GetCurrentResultEvaluateTwoLevelsTree100TimesReturnsBes
     rootState.AddState(CreateTestStateWithSubstates(2, 3));
     rootState.AddState(CreateTestStateWithSubstates(1, 4));
     rootState.AddState(CreateTestStateWithSubstates(0, 5));
-    CTestMCTS mcts = CreateTestMCTS(&rootState);
+    CTestMcts mcts = CreateTestMCTS(&rootState);
     EvaluateNTimes(mcts, 100);
 
     STestMove const bestMove = mcts.GetCurrentResult();
