@@ -2,6 +2,8 @@
 #include <random>
 #include <vector>
 
+#include "mimax/dma/MctsNodeEvalResult.h"
+
 namespace mimax {
 namespace dma {
 
@@ -47,6 +49,20 @@ public:
             {
                 return lhs.m_simulationsCount < rhs.m_simulationsCount;
             })->m_move;
+    }
+
+    SMctsNodeEvalResult<TMove> GetRootEvalResult() const
+    {
+        SMctsNodeEvalResult<TMove> evalResult;
+
+        evalResult.m_childrenInfo.resize(m_root.m_children.size());
+        for (size_t i = 0; i < m_root.m_children.size(); ++i)
+        {
+            evalResult.m_childrenInfo[i].m_move = m_root.m_children[i].m_move;
+            evalResult.m_childrenInfo[i].m_simulationsCount = m_root.m_children[i].m_simulationsCount;
+        }
+
+        return std::move(evalResult);
     }
 
 private:
