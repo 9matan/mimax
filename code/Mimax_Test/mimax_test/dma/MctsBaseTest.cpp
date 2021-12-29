@@ -94,7 +94,9 @@ static auto TestStateIsVisitedMatcher(bool const isVisited)
 
 static STestState CreateTestStateWithSubstates(int const wonSubstatesCnt, int const lostSubstatesCnt)
 {
-    float const playoutScore = wonSubstatesCnt > lostSubstatesCnt
+    // substate must have score for the opponent
+    // won state for me - lost state for another.
+    float const playoutScore = wonSubstatesCnt < lostSubstatesCnt
         ? 1.0f
         : 0.0f;
     STestState state(playoutScore);
@@ -107,12 +109,11 @@ GTEST_TEST(DmaCMCTSBase, EvaluateTwoLevelsTreeExpectOnlyRootChildrenAreVisited)
 {
     vector<STestState*> leafs;
     STestState rootState;
-    leafs.push_back(&rootState.AddWonState().AddWonState());
+    leafs.push_back(&rootState.AddLostState().AddWonState());
     leafs.push_back(&rootState.AddWonState().AddLostState());
-    leafs.push_back(&rootState.AddLostState().AddLostState());
     CTestMcts mcts = CreateTestMCTS(&rootState);
 
-    EvaluateNTimes(mcts, 3);
+    EvaluateNTimes(mcts, 2);
 
     EXPECT_THAT(rootState.m_children,
         testing::Each(TestStateIsVisitedMatcher(true)));

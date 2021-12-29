@@ -129,13 +129,14 @@ private:
             curNode = SelectChildNode(curNode);
         }
 
-        float const score = curNode->IsVisited()
+        float score = curNode->IsVisited()
             ? curNode->m_score / (float)curNode->m_simulationsCount
             : VisitNode(curNode);
 
         while (curNode != nullptr)
         {
             UpdateStatistics(curNode, score);
+            score = 1.0f - score;
             curNode = curNode->m_parent;
         }
     }
@@ -190,7 +191,7 @@ private:
     inline float CalculateUCTScore(SNode const* node)
     {
         auto const parentSimCount = node->m_parent->m_simulationsCount;
-        return  (float)node->m_score / (float)node->m_simulationsCount
+        return  1.0f - (float)node->m_score / (float)node->m_simulationsCount
             + m_explorationParam * (float)sqrt(log(parentSimCount) / node->m_simulationsCount);
     }
 };
