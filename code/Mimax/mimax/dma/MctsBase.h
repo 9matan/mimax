@@ -2,6 +2,7 @@
 #include <random>
 #include <vector>
 
+#include "mimax/dma/MctsDebugInfo.h"
 #include "mimax/dma/MctsNodeEvalResult.h"
 
 namespace mimax {
@@ -30,6 +31,9 @@ public:
         : m_resolver(resolver)
         , m_randomEngine(randomSeed)
         , m_explorationParam(explorationParam)
+#if MIMAX_MCTS_DEBUG
+        , m_currentDepth(0)
+#endif // MIMAX_MCTS_DEBUG
     {
         m_root = SNode();
         m_root.m_state = rootSate;
@@ -65,6 +69,10 @@ public:
         return std::move(evalResult);
     }
 
+#if MIMAX_MCTS_DEBUG
+    inline SMctsDebugInfo const& GetDebugInfo() const { return m_debugInfo; }
+#endif // MIMAX_MCTS_DEBUG
+
 private:
     struct SNode
     {
@@ -96,6 +104,10 @@ private:
     SNode m_root;
     float m_explorationParam;
     TMovesContainer m_movesBuffer;
+#if MIMAX_MCTS_DEBUG
+    SMctsDebugInfo m_debugInfo;
+    size_t m_currentDepth;
+#endif // MIMAX_MCTS_DEBUG
 
 private:
     bool Expanse(SNode* node)
@@ -114,12 +126,19 @@ private:
         }
         node->m_unvisitedChildrenCount = (unsigned short)node->m_children.size();
 
+#if MIMAX_MCTS_DEBUG
+        m_debugInfo.ExpanseNode(m_currentDepth, node->m_children.size());
+#endif // MIMAX_MCTS_DEBUG
+
         return !m_movesBuffer.empty();
     }
 
     void MakeIteration()
     {
         SNode* curNode = SelectChildNode(&m_root);
+#if MIMAX_MCTS_DEBUG
+        m_currentDepth = 1;
+#endif // MIMAX_MCTS_DEBUG
         while (curNode->IsVisited())
         {
             if (!curNode->HasChildren() && !Expanse(curNode))
@@ -127,6 +146,9 @@ private:
                 break;
             }
             curNode = SelectChildNode(curNode);
+#if MIMAX_MCTS_DEBUG
+            ++m_currentDepth;
+#endif // MIMAX_MCTS_DEBUG
         }
 
         float score = curNode->IsVisited()
@@ -138,6 +160,9 @@ private:
             UpdateStatistics(curNode, score);
             score = 1.0f - score;
             curNode = curNode->m_parent;
+#if MIMAX_MCTS_DEBUG
+            --m_currentDepth;
+#endif // MIMAX_MCTS_DEBUG
         }
     }
 
@@ -154,6 +179,9 @@ private:
         --parent->m_unvisitedChildrenCount;
         node->m_state = parent->m_state;
         m_resolver.MakeMove(node->m_state, node->m_move);
+#if MIMAX_MCTS_DEBUG
+        m_debugInfo.VisitNode(m_currentDepth);
+#endif // MIMAX_MCTS_DEBUG
         return m_resolver.Playout(node->m_state);
     }
 
